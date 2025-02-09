@@ -1,10 +1,19 @@
-import { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
-import { Send, Bot, User, Volume2, VolumeX, Mic, MicOff, X } from 'lucide-react';
-import axios from 'axios';
+import { useState, useEffect, useRef } from "react";
+import { motion } from "framer-motion";
+import {
+  Send,
+  Bot,
+  User,
+  Volume2,
+  VolumeX,
+  Mic,
+  MicOff,
+  X,
+} from "lucide-react";
+import axios from "axios";
 
 interface Message {
-  type: 'user' | 'bot';
+  type: "user" | "bot";
   content: string | string[];
   timestamp: Date;
   isThinking?: boolean;
@@ -19,31 +28,32 @@ const thinkingPhrases = [
   "Processing financial insights...",
   "Examining investment patterns...",
   "Evaluating market conditions...",
-  "Generating personalized advice..."
+  "Generating personalized advice...",
 ];
 
 const defaultPrompts = [
   "what is the stock price of Adani green",
   "give me last week return of tata motors",
-  "give me last 3days stock price of tata consultancy services"
+  "give me last 3days stock price of tata consultancy services",
 ];
 
 const Chatbot = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState<Message[]>([
     {
-      type: 'bot',
-      content: 'Hello! I\'m your AI financial assistant. How can I help you today?',
-      timestamp: new Date()
-    }
+      type: "bot",
+      content:
+        "Hello! I'm your AI financial assistant. How can I help you today?",
+      timestamp: new Date(),
+    },
   ]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [currentThinkingIndex, setCurrentThinkingIndex] = useState(0);
   const [isSpeaking, setIsSpeaking] = useState<number | null>(null);
   const [isListening, setIsListening] = useState(false);
   const [isSpeechModalOpen, setIsSpeechModalOpen] = useState(false);
-  const [transcript, setTranscript] = useState('');
+  const [transcript, setTranscript] = useState("");
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -55,23 +65,23 @@ const Chatbot = () => {
 
   useEffect(() => {
     let thinkingInterval: number;
-    
+
     if (isTyping) {
       thinkingInterval = setInterval(() => {
         setCurrentThinkingIndex((prev) => {
           const nextIndex = (prev + 1) % thinkingPhrases.length;
-          setMessages(messages => {
+          setMessages((messages) => {
             const lastMessage = messages[messages.length - 1];
             if (lastMessage.isThinking) {
-              const currentContent = Array.isArray(lastMessage.content) 
-                ? lastMessage.content 
+              const currentContent = Array.isArray(lastMessage.content)
+                ? lastMessage.content
                 : [lastMessage.content];
               return [
                 ...messages.slice(0, -1),
                 {
                   ...lastMessage,
-                  content: [...currentContent, thinkingPhrases[nextIndex]]
-                }
+                  content: [...currentContent, thinkingPhrases[nextIndex]],
+                },
               ];
             }
             return messages;
@@ -98,7 +108,7 @@ const Chatbot = () => {
     }
 
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'en-IN'; // Set to Indian English
+    utterance.lang = "en-IN"; // Set to Indian English
     utterance.rate = 0.9; // Slightly slower than default
     utterance.pitch = 1;
 
@@ -123,84 +133,90 @@ const Chatbot = () => {
 
     // Add user message
     const userMessage: Message = {
-      type: 'user',
+      type: "user",
       content: input,
-      timestamp: new Date()
+      timestamp: new Date(),
     };
-    setMessages(prev => [...prev, userMessage]);
-    setInput('');
+    setMessages((prev) => [...prev, userMessage]);
+    setInput("");
     setIsTyping(true);
     setCurrentThinkingIndex(0);
 
     // Add initial thinking message
-    setMessages(prev => [...prev, {
-      type: 'bot',
-      content: [thinkingPhrases[0]],
-      timestamp: new Date(),
-      isThinking: true
-    }]);
+    setMessages((prev) => [
+      ...prev,
+      {
+        type: "bot",
+        content: [thinkingPhrases[0]],
+        timestamp: new Date(),
+        isThinking: true,
+      },
+    ]);
 
     try {
       const formData = new FormData();
-      formData.append('input', input);
+      formData.append("input", input);
 
       const config = {
-        method: 'post',
+        method: "post",
         maxBodyLength: Infinity,
-        url: 'https://2ecd-111-125-219-62.ngrok-free.app/agent',
-        data: formData
+        url: "https://2ecd-111-125-219-62.ngrok-free.app/agent",
+        data: formData,
       };
 
       const response = await axios.request(config);
       console.log(response.data);
       setIsTyping(false);
-      
+
       // First, show the thought process
-      setMessages(prev => {
+      setMessages((prev) => {
         const lastMessage = prev[prev.length - 1];
         if (lastMessage.isThinking) {
           return [
             ...prev.slice(0, -1),
             {
-              type: 'bot',
+              type: "bot",
               content: [
                 "🤔 Analyzing Your Request:",
                 "───────────────",
                 response.data.thought,
                 "───────────────",
               ],
-              timestamp: new Date()
-            }
+              timestamp: new Date(),
+            },
           ];
         }
         return prev;
       });
 
       // Then show the output with a typing effect
-      let displayedText = '';
+      let displayedText = "";
       const outputText = response.data.output;
       let charIndex = 0;
 
       // Add a temporary message for typing effect
-      setMessages(prev => [...prev, {
-        type: 'bot',
-        content: '',
-        timestamp: new Date(),
-        isTyping: true
-      }]);
+      setMessages((prev) => [
+        ...prev,
+        {
+          type: "bot",
+          content: "",
+          timestamp: new Date(),
+          isTyping: true,
+        },
+      ]);
 
       const typingInterval = setInterval(() => {
         if (charIndex < outputText.length) {
           displayedText += outputText[charIndex];
           charIndex++;
-          
+
           // Update the last message with new text
-          setMessages(prev => {
+          setMessages((prev) => {
             const newMessages = [...prev];
             newMessages[newMessages.length - 1] = {
-              type: 'bot',
+              type: "bot",
               content: displayedText,
-              timestamp: new Date()
+              timestamp: new Date(),
             };
             return newMessages;
           });
@@ -208,20 +224,19 @@ const Chatbot = () => {
           clearInterval(typingInterval);
         }
       }, 30); // Adjust speed as needed - now typing character by character
-
     } catch (error) {
       console.error(error);
       setIsTyping(false);
-      setMessages(prev => {
+      setMessages((prev) => {
         const lastMessage = prev[prev.length - 1];
         if (lastMessage.isThinking) {
           return [
             ...prev.slice(0, -1),
             {
-              type: 'bot',
+              type: "bot",
               content: "Sorry, I encountered an error. Please try again.",
-              timestamp: new Date()
-            }
+              timestamp: new Date(),
+            },
           ];
         }
         return prev;
@@ -234,11 +249,11 @@ const Chatbot = () => {
   };
 
   const startListening = () => {
-    if ('webkitSpeechRecognition' in window) {
+    if ("webkitSpeechRecognition" in window) {
       const recognition = new (window as any).webkitSpeechRecognition();
       recognition.continuous = true;
       recognition.interimResults = true;
-      recognition.lang = 'en-IN';
+      recognition.lang = "en-IN";
 
       recognition.onstart = () => {
         setIsListening(true);
@@ -248,7 +263,7 @@ const Chatbot = () => {
         const transcript = Array.from(event.results)
           .map((result: any) => result[0])
           .map((result) => result.transcript)
-          .join('');
+          .join("");
         setTranscript(transcript);
       };
 
@@ -276,7 +291,7 @@ const Chatbot = () => {
             onClick={() => {
               setIsSpeechModalOpen(false);
               setIsListening(false);
-              setTranscript('');
+              setTranscript("");
             }}
             className="absolute top-4 right-4 text-gray-400 hover:text-gray-500 dark:hover:text-gray-300"
           >
@@ -297,8 +312,8 @@ const Chatbot = () => {
                 }}
                 className={`p-4 rounded-full ${
                   isListening
-                    ? 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400'
-                    : 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400'
+                    ? "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400"
+                    : "bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400"
                 } hover:opacity-80 transition-opacity`}
               >
                 {isListening ? (
@@ -309,7 +324,7 @@ const Chatbot = () => {
               </button>
             </div>
             <div className="min-h-[100px] p-4 bg-gray-50 dark:bg-gray-700 rounded-lg text-gray-700 dark:text-gray-300 text-sm mb-4">
-              {transcript || 'Start speaking...'}
+              {transcript || "Start speaking..."}
             </div>
             <div className="flex space-x-3">
               <button
@@ -317,7 +332,7 @@ const Chatbot = () => {
                   setInput(transcript);
                   setIsSpeechModalOpen(false);
                   setIsListening(false);
-                  setTranscript('');
+                  setTranscript("");
                 }}
                 className="flex-1 bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition-colors"
               >
@@ -325,7 +340,7 @@ const Chatbot = () => {
               </button>
               <button
                 onClick={() => {
-                  setTranscript('');
+                  setTranscript("");
                 }}
                 className="flex-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
               >
@@ -348,8 +363,12 @@ const Chatbot = () => {
               <Bot className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">AI Financial Assistant</h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Ask me anything about your finances</p>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                AI Financial Assistant
+              </h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Ask me anything about your finances
+              </p>
             </div>
           </div>
         </div>
@@ -362,59 +381,86 @@ const Chatbot = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
-              className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
+              className={`flex ${
+                message.type === "user" ? "justify-end" : "justify-start"
+              }`}
             >
-              <div className={`flex items-start space-x-2 max-w-[80%] ${message.type === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`}>
-                <div className={`p-2 rounded-lg ${message.type === 'user' ? 'bg-indigo-600' : 'bg-gray-100 dark:bg-gray-700'}`}>
-                  {message.type === 'user' ? (
+              <div
+                className={`flex items-start space-x-2 max-w-[80%] ${
+                  message.type === "user"
+                    ? "flex-row-reverse space-x-reverse"
+                    : ""
+                }`}
+              >
+                <div
+                  className={`p-2 rounded-lg ${
+                    message.type === "user"
+                      ? "bg-indigo-600"
+                      : "bg-gray-100 dark:bg-gray-700"
+                  }`}
+                >
+                  {message.type === "user" ? (
                     <User className="h-5 w-5 text-white" />
                   ) : (
                     <Bot className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
                   )}
                 </div>
-                <div className={`relative p-4 rounded-2xl ${
-                  message.type === 'user' 
-                    ? 'bg-indigo-600 text-white' 
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white'
-                }`}>
+                <div
+                  className={`relative p-4 rounded-2xl ${
+                    message.type === "user"
+                      ? "bg-indigo-600 text-white"
+                      : "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white"
+                  }`}
+                >
                   <div className="text-sm whitespace-pre-line">
-                    {Array.isArray(message.content) ? (
-                      message.content.map((line, i) => (
-                        <motion.div
-                          key={i}
-                          initial={message.isThinking ? { opacity: 0 } : { opacity: 1 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ duration: 0.5 }}
-                          className={`${
-                            line.startsWith('🤔') ? 'font-semibold text-indigo-600 dark:text-indigo-400' :
-                            line.startsWith('───') ? 'text-gray-400 dark:text-gray-500' :
-                            message.isThinking && i === message.content.length - 1 ? 'text-gray-600 dark:text-gray-400' :
-                            ''
-                          }`}
-                        >
-                          {line}
-                        </motion.div>
-                      ))
-                    ) : (
-                      message.content
-                    )}
+                    {Array.isArray(message.content)
+                      ? message.content.map((line, i) => (
+                          <motion.div
+                            key={i}
+                            initial={
+                              message.isThinking
+                                ? { opacity: 0 }
+                                : { opacity: 1 }
+                            }
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.5 }}
+                            className={`${
+                              line.startsWith("🤔")
+                                ? "font-semibold text-indigo-600 dark:text-indigo-400"
+                                : line.startsWith("───")
+                                ? "text-gray-400 dark:text-gray-500"
+                                : message.isThinking &&
+                                  i === message.content.length - 1
+                                ? "text-gray-600 dark:text-gray-400"
+                                : ""
+                            }`}
+                          >
+                            {line}
+                          </motion.div>
+                        ))
+                      : message.content}
                   </div>
                   <div className="flex items-center justify-between mt-1">
                     <p className="text-xs opacity-70">
-                      {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      {message.timestamp.toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                     </p>
-                    {message.type === 'bot' && !message.isThinking && (
+                    {message.type === "bot" && !message.isThinking && (
                       <button
-                        onClick={() => speak(
-                          Array.isArray(message.content) 
-                            ? message.content.join('\n') 
-                            : message.content,
-                          index
-                        )}
+                        onClick={() =>
+                          speak(
+                            Array.isArray(message.content)
+                              ? message.content.join("\n")
+                              : message.content,
+                            index
+                          )
+                        }
                         className={`ml-2 p-1 rounded-full transition-colors ${
                           isSpeaking === index
-                            ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400'
-                            : 'hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-500 dark:text-gray-400'
+                            ? "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400"
+                            : "hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-500 dark:text-gray-400"
                         }`}
                       >
                         {isSpeaking === index ? (
@@ -476,4 +522,4 @@ const Chatbot = () => {
   );
 };
 
-export default Chatbot; 
+export default Chatbot;
