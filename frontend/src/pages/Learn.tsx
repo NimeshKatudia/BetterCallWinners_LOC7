@@ -9,49 +9,10 @@ import {
 } from "lucide-react";
 
 const videos = {
-  Beginner: [
-    {
-      videolink: "https://www.youtube.com/watch?v=p3OUFMpT7B0",
-      title: "How to Invest For Beginners (2023 Step-by-Step Guide)",
-      description:
-        "A comprehensive guide for beginners on how to start investing in 2023, covering various investment strategies and tips.",
-      duration: "45 min",
-      modules: 1,
-      progress: 0,
-    },
-    {
-      videolink: "https://www.youtube.com/watch?v=ZCFkWDdmXG8",
-      title: "Understanding the Stock Market for Beginners",
-      description:
-        "An easy-to-understand explanation of how the stock market works, tailored for those new to investing.",
-      duration: "30 min",
-      modules: 1,
-      progress: 0,
-    },
-  ],
-  Intermediate: [
-    {
-      videolink: "https://www.youtube.com/watch?v=gFQNPmLKj1k",
-      title: "5 Ways to Save Money Fast - Financial Hacks",
-      description:
-        "Learn five effective strategies to save money quickly and improve your financial situation with practical tips.",
-      duration: "25 min",
-      modules: 1,
-      progress: 0,
-    },
-    {
-      videolink: "https://www.youtube.com/watch?v=M3r2XDceM6A",
-      title: "Investment Strategies and Portfolio Management",
-      description:
-        "Learn about different investment strategies and how to manage your portfolio effectively.",
-      duration: "35 min",
-      modules: 1,
-      progress: 0,
-    },
-  ],
+  Lender: [],
+  Borrower: [],
   Advanced: [
     {
-      videolink: "https://www.youtube.com/watch?v=WEDIj9JBTC8",
       title: "Advanced Stock Trading Strategies",
       description:
         "Discover advanced trading strategies and techniques for experienced investors.",
@@ -64,65 +25,84 @@ const videos = {
 
 const courses = [
   {
-    level: "Beginner",
+    level: "Lender",
     icon: BookOpen,
     courses: [
       {
-        title: "Introduction to Investing",
-        description: "Learn the basics of investing and financial markets",
-        duration: "2 hours",
-        modules: 5,
+        title: "Total Amount Lent",
+        description: "cummulative amount invested in microloans.",
         progress: 80,
       },
       {
-        title: "Understanding Stocks",
-        description: "Master the fundamentals of stock market investing",
-        duration: "3 hours",
-        modules: 8,
+        title: "Available Liquidity / Tokens Remaining",
+        description: "Tokens (or fiat equivalent) still available for lending.",
         progress: 60,
+      },
+      {
+        title: "Earnings & Interest Accrued",
+        description:
+          "Returns generated from interest payments on active loans.",
+        progress: 80,
+      },
+      {
+        title: "Loan Health & Status",
+        description: "Current loans, risk assessments, and repayment statuses.",
+        progress: 80,
       },
     ],
   },
   {
-    level: "Intermediate",
+    level: "Borrower",
     icon: TrendingUp,
     courses: [
       {
-        title: "Technical Analysis",
-        description: "Learn to analyze market trends and patterns",
-        duration: "4 hours",
-        modules: 10,
+        title: "Total Loan Amount Borrowed",
+        description: "Total funds borrowed over time.",
         progress: 30,
       },
       {
-        title: "Portfolio Management",
-        description: "Master the art of building and managing investments",
-        duration: "3 hours",
-        modules: 6,
+        title: "Collateral Tokenized",
+        description: "Total value of tokenized assets used as loan collateral.",
+        progress: 0,
+      },
+      {
+        title: "Repayment Progress",
+        description: "Repayment Status",
+        progress: 0,
+      },
+      {
+        title: "Outstanding Balance",
+        description: "Amount remaining",
+        progress: 0,
+      },
+      {
+        title: "Reputation Score",
+        description:
+          "A dynamic score based on repayment history, affecting future borrowing.",
         progress: 0,
       },
     ],
   },
-  {
-    level: "Advanced",
-    icon: Brain,
-    courses: [
-      {
-        title: "AI in Trading",
-        description: "Explore how AI is revolutionizing trading",
-        duration: "5 hours",
-        modules: 12,
-        progress: 0,
-      },
-      {
-        title: "Risk Management",
-        description: "Advanced strategies for managing investment risks",
-        duration: "4 hours",
-        modules: 8,
-        progress: 0,
-      },
-    ],
-  },
+  // {
+  //   level: "Advanced",
+  //   icon: Brain,
+  //   courses: [
+  //     {
+  //       title: "AI in Trading",
+  //       description: "Explore how AI is revolutionizing trading",
+  //       duration: "5 hours",
+  //       modules: 12,
+  //       progress: 0,
+  //     },
+  //     {
+  //       title: "Risk Management",
+  //       description: "Advanced strategies for managing investment risks",
+  //       duration: "4 hours",
+  //       modules: 8,
+  //       progress: 0,
+  //     },
+  //   ],
+  // },
 ];
 
 const Learn = () => {
@@ -141,7 +121,7 @@ const Learn = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
-            Learning Center
+            Dashboard
           </h1>
           <button className="btn-primary">
             <GraduationCap className="h-5 w-5 mr-2" />
@@ -227,8 +207,8 @@ const Learn = () => {
                     </p>
                   </div>
                   <div className="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
-                    <Shield className="h-4 w-4" />
-                    <span>{course.modules} modules</span>
+                    {/* <Shield className="h-4 w-4" /> */}
+                    {/* <span>{course.modules} modules</span> */}
                   </div>
                 </div>
 
@@ -251,12 +231,9 @@ const Learn = () => {
 
                 <div className="mt-6 flex items-center justify-between">
                   <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                    <BookOpen className="h-4 w-4 mr-1" />
+                    {/* <BookOpen className="h-4 w-4 mr-1" /> */}
                     <span>{course.duration}</span>
                   </div>
-                  <button className="btn-secondary">
-                    {course.progress > 0 ? "Continue" : "Start Course"}
-                  </button>
                 </div>
               </div>
             ))}
@@ -288,7 +265,7 @@ const Learn = () => {
 
                   <div className="mt-6 flex items-center justify-between">
                     <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                      <BookOpen className="h-4 w-4 mr-1" />
+                      {/* <BookOpen className="h-4 w-4 mr-1" /> */}
                       <span>{video.duration}</span>
                     </div>
                     <button
@@ -305,7 +282,7 @@ const Learn = () => {
         </div>
 
         {/* Learning Path */}
-        <div className="mt-12">
+        {/* <div className="mt-12">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
             Your Learning Path
           </h2>
@@ -333,7 +310,7 @@ const Learn = () => {
               ))}
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

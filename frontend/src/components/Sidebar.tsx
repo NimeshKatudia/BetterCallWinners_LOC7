@@ -36,7 +36,7 @@ const Sidebar = () => {
     {
       path: "/portfolio/my-data",
       icon: Database,
-      label: "My Data",
+      label: "Apply for loan",
       tourClass: "tour-my-data",
     },
     {
