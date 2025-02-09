@@ -1,15 +1,6 @@
+// src/App.tsx
 import React, { useState } from "react";
 import axios from "axios";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-} from "recharts";
 import { TrendingUp, Plus, X } from "lucide-react";
 
 interface Asset {
@@ -23,7 +14,7 @@ interface Asset {
   insurance: string;
   ownershipProof: string;
   tokenId?: string;
-  privateKey: string; // Add this line
+  privateKey: string;
 }
 
 interface CalculatorProps {
@@ -48,15 +39,13 @@ const formatRupees = (value: number) => {
   }).format(value);
 };
 
-const Modal = ({
-  isOpen,
-  onClose,
-  children,
-}: {
+interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;
-}) => {
+}
+
+const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
   if (!isOpen) return null;
 
   return (
@@ -74,8 +63,7 @@ const Modal = ({
   );
 };
 
-const MoneyCalc = () => {
-  const [timeframe, setTimeframe] = useState<number>(10);
+const App: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [assets, setAssets] = useState<Asset[]>([
     {
@@ -88,6 +76,7 @@ const MoneyCalc = () => {
       loan: "No",
       insurance: "No",
       ownershipProof: "",
+      privateKey: "",
     },
   ]);
   const [newAsset, setNewAsset] = useState<Partial<Asset>>({
@@ -102,6 +91,7 @@ const MoneyCalc = () => {
     privateKey: "",
   });
 
+  // Upload file to Pinata and update newAsset.ownershipProof with the returned IPFS hash.
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -118,18 +108,26 @@ const MoneyCalc = () => {
         {
           headers: {
             "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${process.env.REACT_APP_PINATA_JWT}`,
+            Authorization: `Bearer ${import.meta.env.VITE_PINATA_JWT}`,
           },
         }
       );
-      setNewAsset({ ...newAsset, ownershipProof: response.data.IpfsHash });
+      setNewAsset((prevAsset) => ({
+        ...prevAsset,
+        ownershipProof: response.data.IpfsHash,
+      }));
     } catch (error) {
       console.error("Error uploading to Pinata:", error);
       alert("Error uploading ownership proof");
     }
   };
 
-  const tokenizeAsset = async (ipfsHash: string, value: number, privateKey: string) => {
+  // Call your backend to tokenize the asset.
+  const tokenizeAsset = async (
+    ipfsHash: string,
+    value: number,
+    privateKey: string
+  ) => {
     try {
       const response = await axios.post("http://localhost:3001/api/tokenize", {
         ipfsHash,
@@ -143,6 +141,7 @@ const MoneyCalc = () => {
     }
   };
 
+  // Add a new asset after tokenization.
   const addAsset = async () => {
     if (
       newAsset.type &&
@@ -174,10 +173,12 @@ const MoneyCalc = () => {
             loan: newAsset.loan,
             insurance: newAsset.insurance,
             ownershipProof: newAsset.ownershipProof,
-            tokenId: response.data.tokenId,
-          },
+            tokenId: response.tokenId, // adjust based on your API response structure
+            privateKey: newAsset.privateKey,
+          } as Asset,
         ]);
 
+        // Reset new asset form
         setNewAsset({
           type: "",
           description: "",
@@ -194,6 +195,8 @@ const MoneyCalc = () => {
         console.error("Asset tokenization failed:", error);
         alert("Failed to tokenize asset");
       }
+    } else {
+      alert("Please fill in all the fields");
     }
   };
 
@@ -204,20 +207,63 @@ const MoneyCalc = () => {
         Manage Your Assets
       </h2>
 
+      {/* Button to open the Add Asset Modal */}
+      <button
+        onClick={() => setIsModalOpen(true)}
+        className="mb-6 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors flex items-center"
+      >
+        <Plus className="mr-2" /> Add New Asset
+      </button>
+
+      {/* List of Assets */}
+      {assets.length > 0 ? (
+        <div className="space-y-4">
+          {assets.map((asset) => (
+            <div key={asset.id} className="border p-4 rounded-lg shadow-sm">
+              <p>
+                <strong>Type:</strong> {asset.type}
+              </p>
+              <p>
+                <strong>Description:</strong> {asset.description}
+              </p>
+              <p>
+                <strong>Location:</strong> {asset.location}
+              </p>
+              <p>
+                <strong>Value:</strong> {formatRupees(asset.value)}
+              </p>
+              <p>
+                <strong>Ownership Proof (IPFS Hash):</strong>{" "}
+                {asset.ownershipProof || "N/A"}
+              </p>
+              {asset.tokenId && (
+                <p>
+                  <strong>Token ID:</strong> {asset.tokenId}
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p>No assets available.</p>
+      )}
+
       {/* Add Asset Modal */}
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <h3 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
           Add New Asset
         </h3>
         <div className="grid grid-cols-2 gap-6">
-          {/* Form fields */}
+          {/* Asset Type */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Asset Type
             </label>
             <select
               value={newAsset.type}
-              onChange={(e) => setNewAsset({ ...newAsset, type: e.target.value })}
+              onChange={(e) =>
+                setNewAsset({ ...newAsset, type: e.target.value })
+              }
               className="w-full p-2.5 border rounded-lg dark:bg-gray-700 dark:border-gray-600"
             >
               <option value="">Select Type</option>
@@ -229,10 +275,106 @@ const MoneyCalc = () => {
             </select>
           </div>
 
+          {/* Description */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Description
+            </label>
+            <input
+              type="text"
+              value={newAsset.description}
+              onChange={(e) =>
+                setNewAsset({ ...newAsset, description: e.target.value })
+              }
+              className="w-full p-2.5 border rounded-lg dark:bg-gray-700 dark:border-gray-600"
+              placeholder="Enter asset description"
+            />
+          </div>
+
+          {/* Location */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Location
+            </label>
+            <input
+              type="text"
+              value={newAsset.location}
+              onChange={(e) =>
+                setNewAsset({ ...newAsset, location: e.target.value })
+              }
+              className="w-full p-2.5 border rounded-lg dark:bg-gray-700 dark:border-gray-600"
+              placeholder="Enter asset location"
+            />
+          </div>
+
+          {/* Value */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Value (in INR)
+            </label>
+            <input
+              type="number"
+              value={newAsset.value || 0}
+              onChange={(e) =>
+                setNewAsset({ ...newAsset, value: Number(e.target.value) })
+              }
+              className="w-full p-2.5 border rounded-lg dark:bg-gray-700 dark:border-gray-600"
+              placeholder="Enter asset value"
+            />
+          </div>
+
+          {/* Condition */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Condition
+            </label>
+            <input
+              type="text"
+              value={newAsset.condition}
+              onChange={(e) =>
+                setNewAsset({ ...newAsset, condition: e.target.value })
+              }
+              className="w-full p-2.5 border rounded-lg dark:bg-gray-700 dark:border-gray-600"
+              placeholder="Enter asset condition"
+            />
+          </div>
+
+          {/* Loan */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Loan
+            </label>
+            <input
+              type="text"
+              value={newAsset.loan}
+              onChange={(e) =>
+                setNewAsset({ ...newAsset, loan: e.target.value })
+              }
+              className="w-full p-2.5 border rounded-lg dark:bg-gray-700 dark:border-gray-600"
+              placeholder="Enter loan details if any"
+            />
+          </div>
+
+          {/* Insurance */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Insurance
+            </label>
+            <input
+              type="text"
+              value={newAsset.insurance}
+              onChange={(e) =>
+                setNewAsset({ ...newAsset, insurance: e.target.value })
+              }
+              className="w-full p-2.5 border rounded-lg dark:bg-gray-700 dark:border-gray-600"
+              placeholder="Enter insurance details if any"
+            />
+          </div>
+
           {/* Ownership Proof */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Ownership Proof
+              Ownership Proof (Image)
             </label>
             <input
               type="file"
@@ -273,4 +415,4 @@ const MoneyCalc = () => {
   );
 };
 
-export default MoneyCalc;
+export default App;
