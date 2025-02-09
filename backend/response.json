@@ -1,0 +1,11 @@
+{
+    "status": false,
+    "message": "The provided input is a JPEG image, not a legal document.  It's impossible to determine validity without a proper legal document.",
+    "documentType": "unknown",
+    "ownerName": "unknown",
+    "verificationDetails": {
+        "isValid": false,
+        "verifiedBy": "Gemini Pro Vision",
+        "comments": "Input is a JPEG image; cannot verify authenticity or validity of a non-document."
+    }
+}

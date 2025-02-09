@@ -12,7 +12,7 @@ const Navbar = () => {
           <div className="flex">
             <Link to="/" className="flex items-center">
               <BarChart2 className="h-8 w-8 text-indigo-600 " />
-              <span className="ml-2 text-xl font-bold text-gray-900">WealthWise</span>
+              <span className="ml-2 text-xl font-bold text-gray-900">NextGenIndia</span>
             </Link>
           </div>
 

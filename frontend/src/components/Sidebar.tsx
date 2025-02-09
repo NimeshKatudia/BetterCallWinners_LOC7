@@ -51,30 +51,6 @@ const Sidebar = () => {
       label: "Applied Loans",
       tourClass: "tour-learn",
     },
-    {
-      path: "/portfolio/financial-path",
-      icon: BarChart2,
-      label: "Financial Path",
-      tourClass: "tour-financial-path",
-    },
-    {
-      path: "/portfolio/chatbot",
-      icon: MessageSquare,
-      label: "AI Assistant",
-      tourClass: "tour-ai-assistant",
-    },
-    {
-      path: "/portfolio/money-pulse",
-      icon: Newspaper,
-      label: "Money Pulse",
-      tourClass: "tour-money-pulse",
-    },
-    {
-      path: "/portfolio/stock-analyzer",
-      icon: LineChart,
-      label: "Stock Analyzer",
-      tourClass: "tour-stock-analyzer",
-    },
   ];
 
   return (
@@ -84,7 +60,7 @@ const Sidebar = () => {
           <Link to="/" className="flex items-center tour-logo">
             <BarChart2 className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
             <span className="ml-2 text-xl font-bold text-gray-900 dark:text-white">
-              WealthWise
+              NextGenIndia
             </span>
           </Link>
         </div>
