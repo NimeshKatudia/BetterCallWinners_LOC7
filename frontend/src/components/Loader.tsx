@@ -1,33 +1,33 @@
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
 
 interface LoaderProps {
-  size?: 'small' | 'medium' | 'large';
-  color?: 'primary' | 'white';
+  size?: "small" | "medium" | "large";
+  color?: "primary" | "white";
 }
 
-const Loader = ({ size = 'medium', color = 'primary' }: LoaderProps) => {
+const Loader = ({ size = "medium", color = "primary" }: LoaderProps) => {
   const sizeClasses = {
-    small: 'w-16 h-16',
-    medium: 'w-24 h-24',
-    large: 'w-32 h-32'
+    small: "w-16 h-16",
+    medium: "w-24 h-24",
+    large: "w-32 h-32",
   };
 
   const colorClasses = {
-    primary: 'text-indigo-600 dark:text-indigo-400',
-    white: 'text-white'
+    primary: "text-indigo-600 dark:text-indigo-400",
+    white: "text-white",
   };
 
   const circleVariants = {
     initial: { opacity: 0, y: 0 },
-    animate: { 
+    animate: {
       opacity: [0.2, 1, 0.2],
       y: [-2, 2, -2],
       transition: {
         duration: 1.5,
         repeat: Infinity,
-        ease: "easeInOut"
-      }
-    }
+        ease: "easeInOut",
+      },
+    },
   };
 
   const containerVariants = {
@@ -36,9 +36,9 @@ const Loader = ({ size = 'medium', color = 'primary' }: LoaderProps) => {
       transition: {
         duration: 3,
         repeat: Infinity,
-        ease: "linear"
-      }
-    }
+        ease: "linear",
+      },
+    },
   };
 
   return (
@@ -53,10 +53,12 @@ const Loader = ({ size = 'medium', color = 'primary' }: LoaderProps) => {
             key={index}
             className={`absolute w-3 h-3 rounded-full ${colorClasses[color]}`}
             style={{
-              left: '50%',
-              top: '50%',
-              transform: `rotate(${index * 45}deg) translate(0, -${size === 'small' ? '12' : size === 'medium' ? '16' : '20'}px)`,
-              transformOrigin: '0 50%'
+              left: "50%",
+              top: "50%",
+              transform: `rotate(${index * 45}deg) translate(0, -${
+                size === "small" ? "12" : size === "medium" ? "16" : "20"
+              }px)`,
+              transformOrigin: "0 50%",
             }}
             variants={circleVariants}
             initial="initial"
@@ -101,4 +103,4 @@ const Loader = ({ size = 'medium', color = 'primary' }: LoaderProps) => {
   );
 };
 
-export default Loader; 
+export default Loader;

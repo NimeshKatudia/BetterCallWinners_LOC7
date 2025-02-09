@@ -42,13 +42,13 @@ const Sidebar = () => {
     {
       path: "/portfolio/recommendations",
       icon: TrendingUp,
-      label: "Recommendations",
+      label: "Available Loans",
       tourClass: "tour-recommendations",
     },
     {
       path: "/portfolio/learn",
-      icon: BookOpen,
-      label: "Money Matters",
+      icon: Newspaper,
+      label: "Applied Loans",
       tourClass: "tour-learn",
     },
     {
